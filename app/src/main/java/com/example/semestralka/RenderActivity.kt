@@ -1,6 +1,5 @@
 package com.example.semestralka
 
-import android.os.AsyncTask
 import android.os.Bundle
 import android.os.Environment
 import android.util.Log
@@ -13,12 +12,10 @@ import com.caverock.androidsvg.SVG
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.net.HttpURLConnection
-import java.net.URL
 
 class RenderActivity : AppCompatActivity() {
 
-    private var svgContent: String? = null
+    var svgContent: String? = null
     private var currentFileName: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -92,7 +89,7 @@ class RenderActivity : AppCompatActivity() {
         }
     }
 
-    private fun displaySvg(svg: SVG, scale: Int) {
+    fun displaySvg(svg: SVG, scale: Int) {
         val imageView = findViewById<ImageView>(R.id.imageView)
         imageView.setLayerType(ImageView.LAYER_TYPE_SOFTWARE, null)
         imageView.setImageDrawable(SVGDrawable(svg, scale)) 
@@ -162,40 +159,6 @@ class RenderActivity : AppCompatActivity() {
             "rendered_latex_${timestamp}_description.${format}"
         } else {
             throw Exception("Invalid file format: $format")
-        }
-    }
-
-    private class DownloadTask(val imageView: ImageView, val scale: Int) : AsyncTask<String, Void, SVG?>() {
-        private var svgContent: String? = null
-
-        override fun doInBackground(vararg params: String?): SVG? {
-            return try {
-                val url = URL(params[0])
-                val connection = url.openConnection() as HttpURLConnection
-                connection.requestMethod = "GET"
-                connection.connect()
-                Log.d("DownloadTask", "Connection established")
-
-                val inputStream = connection.inputStream
-                svgContent = inputStream.bufferedReader().use { it.readText() }
-                val svg = SVG.getFromString(svgContent)
-                Log.d("DownloadTask", "SVG fetched")
-                svg
-            } catch (e: Exception) {
-                Log.e("DownloadTask", "Error fetching SVG", e)
-                null
-            }
-        }
-
-        override fun onPostExecute(svg: SVG?) {
-            super.onPostExecute(svg)
-            if (svg != null) {
-                Log.d("DownloadTask", "SVG successfully fetched")
-                (imageView.context as RenderActivity).svgContent = svgContent
-                (imageView.context as RenderActivity).displaySvg(svg, scale)
-            } else {
-                Log.e("DownloadTask", "Failed to fetch SVG")
-            }
         }
     }
 
