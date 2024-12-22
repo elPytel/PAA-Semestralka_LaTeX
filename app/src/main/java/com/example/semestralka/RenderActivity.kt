@@ -10,6 +10,7 @@ import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.caverock.androidsvg.SVG
+import com.google.gson.Gson
 import java.io.File
 import java.io.FileInputStream
 
@@ -29,6 +30,7 @@ class RenderActivity : AppCompatActivity() {
         val btnSave = findViewById<Button>(R.id.btnSave)
         val btnDelete = findViewById<Button>(R.id.btnDelete)
         val btnBack = findViewById<Button>(R.id.btnBack)
+        
         var equation: Equation? = null
 
         btnBack.setOnClickListener {
@@ -36,22 +38,31 @@ class RenderActivity : AppCompatActivity() {
         }
 
         btnSave.setOnClickListener {
-            equation?.saveToFile(this)
+            equation?.saveOrUpdateFile(this)
         }
 
         btnDelete.setOnClickListener {
             equation?.deleteFile(this)
         }
 
-        // Get svg image and scale from intent
-        val fileName = intent.getStringExtra("fileName")
-        val scale = intent.getIntExtra("scale", 10)
+        // Get equation data from intent
+        val equationDataJson = intent.getStringExtra("equationData")
+        val equationData = Gson().fromJson(equationDataJson, EquationData::class.java)
+        
+        val jsonFileName = intent.getStringExtra("jsonFileName")
         val latex = intent.getStringExtra("latex")
 
-        if (fileName != null) {
-            currentFileName = fileName
-            equation = Equation(fileName, fileName.replace(".svg", "_description.txt"), this, imageView)
+        if (equationData != null) {
+            equation = Equation(equationData, this, imageView)
             etDescription.setText(equation.description)
+            etLabel.setText(equation.label)
+            etScale.setText(equation.scale.toString())
+            equation.displaySvg()
+        } else if (jsonFileName != null) {
+            equation = Equation(jsonFileName, this, imageView)
+            etDescription.setText(equation.description)
+            etLabel.setText(equation.label)
+            etScale.setText(equation.scale.toString())
             equation.displaySvg()
         } else if (latex != null) {
             equation = Equation(imageView)

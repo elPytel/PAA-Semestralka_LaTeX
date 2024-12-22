@@ -7,8 +7,8 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 class FormulasAdapter(
-    private val formulas: List<String>,
-    private val onItemClick: (String) -> Unit
+    private val formulas: List<EquationData>,
+    private val onItemClick: (EquationData) -> Unit
 ) : RecyclerView.Adapter<FormulasAdapter.FormulaViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FormulaViewHolder {
@@ -17,7 +17,7 @@ class FormulasAdapter(
     }
 
     override fun onBindViewHolder(holder: FormulaViewHolder, position: Int) {
-        holder.textView.text = formulas[position]
+        holder.textView.text = formulas[position].label
         holder.itemView.setOnClickListener {
             onItemClick(formulas[position])
         }

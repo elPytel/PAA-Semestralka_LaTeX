@@ -6,6 +6,7 @@ import android.os.Environment
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.gson.Gson
 import java.io.File
 
 class SavedFormulasActivity : AppCompatActivity() {
@@ -18,17 +19,21 @@ class SavedFormulasActivity : AppCompatActivity() {
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         val formulas = loadSavedFormulas()
-        val adapter = FormulasAdapter(formulas) { fileName ->
+        val adapter = FormulasAdapter(formulas) { equationData ->
             val intent = Intent(this, RenderActivity::class.java)
-            intent.putExtra("fileName", fileName)
+            //intent.putExtra("equationData", Gson().toJson(equationData))
+            intent.putExtra("jsonFileName", equationData.thisFileName)
             startActivity(intent)
         }
         recyclerView.adapter = adapter
     }
 
-    private fun loadSavedFormulas(): List<String> {
+    private fun loadSavedFormulas(): List<EquationData> {
         val dir = getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS)
-        val files = dir?.listFiles { _, name -> name.endsWith(".svg") } ?: return emptyList()
-        return files.map { it.name }
+        val files = dir?.listFiles { _, name -> name.endsWith(".json") } ?: return emptyList()
+        return files.mapNotNull { file ->
+            val equationData = Equation.loadFromJsonFile(this, file.name)
+            equationData
+        }
     }
 }

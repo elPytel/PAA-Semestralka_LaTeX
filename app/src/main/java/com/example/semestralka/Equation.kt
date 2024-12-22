@@ -6,9 +6,21 @@ import android.util.Log
 import android.widget.ImageView
 import android.widget.Toast
 import com.caverock.androidsvg.SVG
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.lang.reflect.Type
+
+data class EquationData(
+    val equation: String,
+    val label: String,
+    val description: String,
+    val scale: Int,
+    val svgFileName: String,
+    val thisFileName: String,
+)
 
 class Equation {
     var equation: String? = null
@@ -16,16 +28,35 @@ class Equation {
     var label: String? = null
     var svgFile: SVG? = null
     var scale: Int = 1
+
     private var imageView: ImageView? = null
+    private var jsonFileName: String? = null
 
     constructor(imageView: ImageView) {
         this.imageView = imageView
     }
 
-    constructor(svgFileName: String, descriptionFileName: String, context: Context, imageView: ImageView) {
+    constructor(equationData: EquationData, context: Context, imageView: ImageView) {
         this.imageView = imageView
-        this.svgFile = loadSvgFromFile(svgFileName, context)
-        this.description = loadDescriptionFromFile(descriptionFileName, context)
+        this.svgFile = loadSvgFromFile(equationData.svgFileName, context)
+        data2equation(equationData)
+    }
+
+    constructor(jsonFile: String, context: Context, imageView: ImageView) {
+        this.jsonFileName = jsonFile
+        this.imageView = imageView
+        val equationData = loadFromJsonFile(context, jsonFile)
+        // Load SVG content from file
+        this.svgFile = loadSvgFromFile(equationData!!.svgFileName, context)
+        data2equation(equationData)
+    }
+
+    fun data2equation(data: EquationData) {
+        this.equation = data.equation
+        this.label = data.label
+        this.description = data.description
+        this.scale = data.scale
+        this.jsonFileName = data.thisFileName
     }
 
     fun setSvgContent(svgContent: String) {
@@ -90,63 +121,78 @@ class Equation {
         }
     }
 
-    fun saveToFile(context: Context) {
+    fun saveOrUpdateFile(context: Context) {
         if (equation != null) {
-            try {
-                val fileName = generateFileName()
-                val file = File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), fileName + ".svg")
-                val fos = FileOutputStream(file)
-                fos.write(equation!!.toByteArray())
-                fos.close()
-                Log.i("Equation", "SVG file: ${fileName}, saved to ${file.absolutePath}")
-
-                val descFileName = fileName + "_description"
-                val descFile = File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), descFileName + ".txt")
-                val descFos = FileOutputStream(descFile)
-                descFos.write((description ?: "").toByteArray())
-                descFos.close()
-                Log.i("Equation", "Description file: ${descFileName}, saved to ${descFile.absolutePath}")
-
-                Toast.makeText(context, "SVG and description saved to ${file.absolutePath}", Toast.LENGTH_LONG).show()
-            } catch (e: Exception) {
-                Log.e("Equation", "Error saving SVG or description", e)
-                Toast.makeText(context, "Failed to save SVG or description", Toast.LENGTH_LONG).show()
+            if (jsonFileName != null) {
+                deleteFile(context)
+                saveToFile(context)
+            } else {
+                saveToFile(context)
             }
         } else {
             Toast.makeText(context, "No SVG content to save", Toast.LENGTH_LONG).show()
         }
     }
 
-    fun deleteFile(context: Context) {
-        if (svgFile != null) {
-            try {
-                val file = File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), svgFile!!.documentTitle)
-                val descFileName = svgFile!!.documentTitle.replace(".svg", "_description.txt")
-                val descFile = File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), descFileName)
+    private fun saveToFile(context: Context) {
+        try {
+            val timestamp = System.currentTimeMillis()
+            val fileName = "rendered_latex_${timestamp}.svg"
+            val file = File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), fileName)
+            val fos = FileOutputStream(file)
+            fos.write(equation!!.toByteArray())
+            fos.close()
+            Log.i("Equation", "SVG file: ${fileName}, saved to ${file.absolutePath}")
 
-                if (file.exists()) {
-                    file.delete()
-                    Log.i("Equation", "SVG file deleted: ${file.absolutePath}")
-                }
+            
+            val jsonFileName = "rendered_latex_${timestamp}.json"
+            val equationData = EquationData(
+                equation = equation!!,
+                label = label ?: "Untitled",
+                description = description ?: "",
+                scale = scale,
+                svgFileName = fileName,
+                thisFileName = jsonFileName,
+            )
+            val jsonFile = File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), jsonFileName)
+            val jsonFos = FileOutputStream(jsonFile)
+            jsonFos.write(Gson().toJson(equationData).toByteArray())
+            jsonFos.close()
+            Log.i("Equation", "JSON file: ${jsonFileName}, saved to ${jsonFile.absolutePath}")
 
-                if (descFile.exists()) {
-                    descFile.delete()
-                    Log.i("Equation", "Description file deleted: ${descFile.absolutePath}")
-                }
-
-                Toast.makeText(context, "SVG and description deleted", Toast.LENGTH_LONG).show()
-            } catch (e: Exception) {
-                Log.e("Equation", "Error deleting SVG or description", e)
-                Toast.makeText(context, "Failed to delete SVG or description", Toast.LENGTH_LONG).show()
-            }
-        } else {
-            Toast.makeText(context, "No SVG file to delete", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, "SVG and description saved to ${file.absolutePath}", Toast.LENGTH_LONG).show()
+        } catch (e: Exception) {
+            Log.e("Equation", "Error saving SVG or description", e)
+            Toast.makeText(context, "Failed to save SVG or description", Toast.LENGTH_LONG).show()
         }
     }
 
-    private fun generateFileName(): String {
-        val timestamp = System.currentTimeMillis()
-        return "rendered_latex_${timestamp}"
+    fun deleteFile(context: Context) {
+        try {
+            val jsonFile = File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), jsonFileName!!)
+            val equationData = loadFromJsonFile(context, jsonFileName!!)
+
+            if (equationData != null) {
+                val svgFile = File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), equationData.svgFileName)
+
+                if (svgFile.exists()) {
+                    svgFile.delete()
+                    Log.i("Equation", "SVG file deleted: ${svgFile.absolutePath}")
+                }
+
+                if (jsonFile.exists()) {
+                    jsonFile.delete()
+                    Log.i("Equation", "JSON file deleted: ${jsonFile.absolutePath}")
+                }
+
+                Toast.makeText(context, "SVG and JSON deleted", Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(context, "Failed to load JSON data", Toast.LENGTH_LONG).show()
+            }
+        } catch (e: Exception) {
+            Log.e("Equation", "Error deleting SVG or JSON", e)
+            Toast.makeText(context, "Failed to delete SVG or JSON", Toast.LENGTH_LONG).show()
+        }
     }
 
     private class SVGDrawable(val svg: SVG, val scale: Int) : android.graphics.drawable.Drawable() {
@@ -161,6 +207,21 @@ class Equation {
         override fun setAlpha(alpha: Int) {}
         override fun setColorFilter(colorFilter: android.graphics.ColorFilter?) {}
         override fun getOpacity(): Int = android.graphics.PixelFormat.TRANSLUCENT
+    }
+
+    companion object {
+        fun loadFromJsonFile(context: Context, jsonFileName: String): EquationData? {
+            return try {
+                val jsonFile = File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), jsonFileName)
+                val jsonInputStream = FileInputStream(jsonFile)
+                val jsonContent = jsonInputStream.bufferedReader().use { it.readText() }
+                jsonInputStream.close()
+                Gson().fromJson(jsonContent, EquationData::class.java)
+            } catch (e: Exception) {
+                Log.e("Equation", "Error loading JSON from file", e)
+                null
+            }
+        }
     }
 }
 
