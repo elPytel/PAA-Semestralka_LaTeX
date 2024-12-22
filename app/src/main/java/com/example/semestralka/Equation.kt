@@ -12,10 +12,11 @@ import java.io.FileOutputStream
 
 class Equation {
     var equation: String? = null
-    var svgFile: SVG? = null
     var description: String? = null
+    var label: String? = null
+    var svgFile: SVG? = null
+    var scale: Int = 1
     private var imageView: ImageView? = null
-    private var scale: Int = 1
 
     constructor(equation: String, scale: Int, imageView: ImageView) {
         this.equation = equation
@@ -44,7 +45,14 @@ class Equation {
         }
     }
 
-    // rename method to avoid clash
+    fun updateLabel(label: String) {
+        this.label = label
+    }
+
+    fun updateScale(scale: Int) {
+        this.scale = scale
+    }
+
     fun updateDescription(description: String) {
         this.description = description
     }
@@ -93,7 +101,7 @@ class Equation {
                 val descFileName = fileName + "_description"
                 val descFile = File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), descFileName + ".txt")
                 val descFos = FileOutputStream(descFile)
-                descFos.write(description!!.toByteArray())
+                descFos.write((description ?: "").toByteArray())
                 descFos.close()
                 Log.i("Equation", "Description file: ${descFileName}, saved to ${descFile.absolutePath}")
 

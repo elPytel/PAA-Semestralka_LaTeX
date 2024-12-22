@@ -20,11 +20,13 @@ class RenderActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_render)
 
-        val btnBack = findViewById<Button>(R.id.btnBack)
-        val btnSave = findViewById<Button>(R.id.btnSave)
-        val btnDelete = findViewById<Button>(R.id.btnDelete)
+        val etLabel = findViewById<EditText>(R.id.etLabel)
         val imageView = findViewById<ImageView>(R.id.imageView)
         val etDescription = findViewById<EditText>(R.id.etDescription)
+        val etScale = findViewById<EditText>(R.id.etScale)
+        val btnSave = findViewById<Button>(R.id.btnSave)
+        val btnDelete = findViewById<Button>(R.id.btnDelete)
+        val btnBack = findViewById<Button>(R.id.btnBack)
         var equation: Equation? = null
 
         btnBack.setOnClickListener {
