@@ -18,13 +18,8 @@ class Equation {
     var scale: Int = 1
     private var imageView: ImageView? = null
 
-    constructor(equation: String, scale: Int, imageView: ImageView) {
-        this.equation = equation
-        this.scale = scale
+    constructor(imageView: ImageView) {
         this.imageView = imageView
-        val url = "https://math.vercel.app/?from=$equation"
-        Log.d("Equation", "Fetching URL: $url with scale: $scale")
-        DownloadTask(this).execute(url)
     }
 
     constructor(svgFileName: String, descriptionFileName: String, context: Context, imageView: ImageView) {
@@ -43,6 +38,13 @@ class Equation {
             imageView!!.setLayerType(ImageView.LAYER_TYPE_SOFTWARE, null)
             imageView!!.setImageDrawable(SVGDrawable(svgFile!!, scale))
         }
+    }
+
+    fun updateEquation(equation: String) {
+        this.equation = equation
+        val url = "https://math.vercel.app/?from=$equation"
+        Log.d("Equation", "Fetching URL: $url with scale: $scale")
+        DownloadTask(this).execute(url)
     }
 
     fun updateLabel(label: String) {

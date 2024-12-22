@@ -1,6 +1,8 @@
 package com.example.semestralka
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
@@ -44,17 +46,45 @@ class RenderActivity : AppCompatActivity() {
         // Get svg image and scale from intent
         val fileName = intent.getStringExtra("fileName")
         val scale = intent.getIntExtra("scale", 10)
+        val latex = intent.getStringExtra("latex")
 
         if (fileName != null) {
             currentFileName = fileName
             equation = Equation(fileName, fileName.replace(".svg", "_description.txt"), this, imageView)
             etDescription.setText(equation.description)
             equation.displaySvg()
-        } else {
-            val latex = intent.getStringExtra("latex")
-            if (latex != null) {
-                equation = Equation(latex, scale, imageView)
-            }
+        } else if (latex != null) {
+            equation = Equation(imageView)
+            equation.updateEquation(latex)
         }
+
+        etScale.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                val newScale = s.toString().toIntOrNull() ?: 10
+                equation?.updateScale(newScale)
+                equation?.displaySvg()
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
+
+        etLabel.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                equation?.updateLabel(s.toString())
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
+
+        etDescription.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(s: Editable?) {
+                equation?.updateDescription(s.toString())
+            }
+
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+        })
     }
 }
