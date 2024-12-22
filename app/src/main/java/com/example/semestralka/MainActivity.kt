@@ -16,6 +16,7 @@ class MainActivity : AppCompatActivity() {
         val btnRender = findViewById<Button>(R.id.btnRender)
         val etLatex = findViewById<EditText>(R.id.etLatex)
         val etScale = findViewById<EditText>(R.id.etScale)
+        val btnSavedFormulas = findViewById<Button>(R.id.btnSavedFormulas)
 
         btnRender.setOnClickListener {
             val latexInput = etLatex.text.toString()
@@ -24,6 +25,11 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, RenderActivity::class.java)
             intent.putExtra("latex", latexInput)
             intent.putExtra("scale", scaleInput)
+            startActivity(intent)
+        }
+
+        btnSavedFormulas.setOnClickListener {
+            val intent = Intent(this, SavedFormulasActivity::class.java)
             startActivity(intent)
         }
     }

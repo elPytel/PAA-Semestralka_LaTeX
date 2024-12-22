@@ -26,12 +26,17 @@
             android:layout_height="wrap_content"
             android:hint="Enter LaTeX formula" />
 
-
         <Button
             android:id="@+id/btnRender"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Render Formula" />
+
+        <Button
+            android:id="@+id/btnSavedFormulas"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="View Saved Formulas" />
 
     </LinearLayout>
 
