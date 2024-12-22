@@ -2,12 +2,11 @@ package com.example.semestralka
 
 import android.os.AsyncTask
 import android.util.Log
-import android.widget.ImageView
 import com.caverock.androidsvg.SVG
 import java.net.HttpURLConnection
 import java.net.URL
 
-class DownloadTask(private val imageView: ImageView, private val scale: Int) : AsyncTask<String, Void, SVG?>() {
+class DownloadTask(private val equation: Equation) : AsyncTask<String, Void, SVG?>() {
     private var svgContent: String? = null
 
     override fun doInBackground(vararg params: String?): SVG? {
@@ -33,8 +32,8 @@ class DownloadTask(private val imageView: ImageView, private val scale: Int) : A
         super.onPostExecute(svg)
         if (svg != null) {
             Log.d("DownloadTask", "SVG successfully fetched")
-            (imageView.context as RenderActivity).svgContent = svgContent
-            (imageView.context as RenderActivity).displaySvg(svg, scale)
+            equation.setSvgContent(svgContent!!)
+            equation.displaySvg()
         } else {
             Log.e("DownloadTask", "Failed to fetch SVG")
         }
