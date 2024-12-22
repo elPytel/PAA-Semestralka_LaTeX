@@ -2,6 +2,7 @@ package com.example.semestralka
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
@@ -17,6 +18,7 @@ class MainActivity : AppCompatActivity() {
 
         btnRender.setOnClickListener {
             val latexInput = etLatex.text.toString()
+            Log.d("MainActivity", "Latex input: $latexInput")
             val intent = Intent(this, RenderActivity::class.java)
             intent.putExtra("latex", latexInput)
             startActivity(intent)
