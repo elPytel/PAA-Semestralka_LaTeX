@@ -1,8 +1,5 @@
 package com.example.semestralka
 
-import android.graphics.Bitmap
-import android.graphics.Canvas
-import android.graphics.Picture
 import android.os.AsyncTask
 import android.os.Bundle
 import android.util.Log
@@ -10,7 +7,6 @@ import android.widget.Button
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import com.caverock.androidsvg.SVG
-import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
 
@@ -28,15 +24,16 @@ class RenderActivity : AppCompatActivity() {
         }
 
         val latex = intent.getStringExtra("latex")
+        val scale = intent.getIntExtra("scale", 10)
         if (latex != null) {
             val url = "https://math.vercel.app/?from=$latex"
-            Log.d("RenderActivity", "Fetching URL: $url")
-            RenderTask(imageView).execute(url)
+            Log.d("RenderActivity", "Fetching URL: $url with scale: $scale")
+            RenderTask(imageView, scale).execute(url)
         }
     }
 
-    private class RenderTask(val imageView: ImageView) : AsyncTask<String, Void, Bitmap?>() {
-        override fun doInBackground(vararg params: String?): Bitmap? {
+    private class RenderTask(val imageView: ImageView, val scale: Int) : AsyncTask<String, Void, SVG?>() {
+        override fun doInBackground(vararg params: String?): SVG? {
             return try {
                 val url = URL(params[0])
                 val connection = url.openConnection() as HttpURLConnection
@@ -46,32 +43,37 @@ class RenderActivity : AppCompatActivity() {
 
                 val inputStream = connection.inputStream
                 val svg = SVG.getFromInputStream(inputStream)
-                val picture = svg.renderToPicture()
-                Log.d("RenderTask", "SVG rendered to picture")
-                pictureToBitmap(picture)
+                Log.d("RenderTask", "SVG fetched")
+                svg
             } catch (e: Exception) {
-                Log.e("RenderTask", "Error fetching or rendering SVG", e)
+                Log.e("RenderTask", "Error fetching SVG", e)
                 null
             }
         }
 
-        override fun onPostExecute(result: Bitmap?) {
-            super.onPostExecute(result)
-            if (result != null) {
-                Log.d("RenderTask", "Bitmap successfully created")
-                imageView.setImageBitmap(result)
+        override fun onPostExecute(svg: SVG?) {
+            super.onPostExecute(svg)
+            if (svg != null) {
+                Log.d("RenderTask", "SVG successfully fetched")
+                imageView.setLayerType(ImageView.LAYER_TYPE_SOFTWARE, null)
+                imageView.setImageDrawable(SVGDrawable(svg, scale))
             } else {
-                Log.e("RenderTask", "Failed to create bitmap")
+                Log.e("RenderTask", "Failed to fetch SVG")
             }
         }
+    }
 
-        private fun pictureToBitmap(picture: Picture): Bitmap {
-            val width = picture.width.takeIf { it > 0 } ?: 1
-            val height = picture.height.takeIf { it > 0 } ?: 1
-            val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
-            val canvas = Canvas(bitmap)
-            canvas.drawPicture(picture)
-            return bitmap
+    private class SVGDrawable(val svg: SVG, val scale: Int) : android.graphics.drawable.Drawable() {
+        override fun draw(canvas: android.graphics.Canvas) {
+            val width = canvas.width / scale
+            val height = canvas.height / scale
+            svg.documentWidth = width.toFloat()
+            svg.documentHeight = height.toFloat()
+            svg.renderToCanvas(canvas)
         }
+
+        override fun setAlpha(alpha: Int) {}
+        override fun setColorFilter(colorFilter: android.graphics.ColorFilter?) {}
+        override fun getOpacity(): Int = android.graphics.PixelFormat.TRANSLUCENT
     }
 }

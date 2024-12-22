@@ -14,10 +14,18 @@
         tools:context=".MainActivity">
 
         <EditText
+            android:id="@+id/etScale"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Enter scale (default 10)"
+            android:inputType="number" />
+        
+        <EditText
             android:id="@+id/etLatex"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="Enter LaTeX formula" />
+
 
         <Button
             android:id="@+id/btnRender"

@@ -15,12 +15,15 @@ class MainActivity : AppCompatActivity() {
 
         val btnRender = findViewById<Button>(R.id.btnRender)
         val etLatex = findViewById<EditText>(R.id.etLatex)
+        val etScale = findViewById<EditText>(R.id.etScale)
 
         btnRender.setOnClickListener {
             val latexInput = etLatex.text.toString()
-            Log.d("MainActivity", "Latex input: $latexInput")
+            val scaleInput = etScale.text.toString().toIntOrNull() ?: 10
+            Log.d("MainActivity", "Latex input: $latexInput, Scale input: $scaleInput")
             val intent = Intent(this, RenderActivity::class.java)
             intent.putExtra("latex", latexInput)
+            intent.putExtra("scale", scaleInput)
             startActivity(intent)
         }
     }
