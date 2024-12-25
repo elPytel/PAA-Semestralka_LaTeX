@@ -31,24 +31,40 @@ class Equation {
 
     private var imageView: ImageView? = null
     private var jsonFileName: String? = null
+    var svgFileName: String? = null
+    var context: Context
 
-    constructor(imageView: ImageView?) {
+    constructor(context: Context, imageView: ImageView?) {
+        this.context = context
         this.imageView = imageView
     }
 
     constructor(equationData: EquationData, context: Context, imageView: ImageView?) {
+        this.context = context
         this.imageView = imageView
-        this.svgFile = loadSvgFromFile(equationData.svgFileName, context)
         data2equation(equationData)
+        try {
+            this.svgFile = loadSvgFromFile(equationData.svgFileName, context)
+            Log.d("Equation", "SVG loaded from file")
+        } catch (e: Exception) {
+            Log.e("Equation", "Error loading SVG from file, will try to update equation from web.")
+            updateEquation(equationData.equation)
+        }
     }
 
     constructor(jsonFile: String, context: Context, imageView: ImageView?) {
+        val equationData = loadFromJsonFile(context, jsonFile)
+        this.context = context
         this.jsonFileName = jsonFile
         this.imageView = imageView
-        val equationData = loadFromJsonFile(context, jsonFile)
-        // Load SVG content from file
-        this.svgFile = loadSvgFromFile(equationData!!.svgFileName, context)
-        data2equation(equationData)
+        data2equation(equationData!!)
+        try {
+            this.svgFile = loadSvgFromFile(equationData.svgFileName, context)
+            Log.d("Equation", "SVG loaded from file")
+        } catch (e: Exception) {
+            Log.e("Equation", "Error loading SVG from file, will try to update equation from web.", e)
+            updateEquation(equationData.equation)
+        }
     }
 
     fun data2equation(data: EquationData) {
@@ -57,6 +73,7 @@ class Equation {
         this.description = data.description
         this.scale = data.scale
         this.jsonFileName = data.thisFileName
+        this.svgFileName = data.svgFileName
     }
 
     fun equation2data(): EquationData {
@@ -79,7 +96,7 @@ class Equation {
         this.equation = equation
         val url = "https://math.vercel.app/?from=$equation"
         Log.d("Equation", "Fetching URL: $url with scale: $scale")
-        DownloadTask(this).execute(url)
+        DownloadTask(context, this).execute(url)
     }
 
     fun updateLabel(label: String) {
@@ -109,18 +126,12 @@ class Equation {
     }
 
     private fun loadSvgFromFile(fileName: String, context: Context): SVG {
-        return try {
-            val file = File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), fileName)
-            val inputStream = FileInputStream(file)
-            val svgContent = inputStream.bufferedReader().use { it.readText() }
-            val svg = SVG.getFromString(svgContent)
-            inputStream.close()
-            Log.d("Equation", "SVG loaded from file")
-            svg
-        } catch (e: Exception) {
-            Log.e("Equation", "Error loading SVG from file", e)
-            SVG.getFromString("")
-        }
+        val file = File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), fileName)
+        val inputStream = FileInputStream(file)
+        val svgContent = inputStream.bufferedReader().use { it.readText() }
+        val svg = SVG.getFromString(svgContent)
+        inputStream.close()
+        return svg
     }
 
     fun saveOrUpdateFile(context: Context) {
@@ -136,7 +147,7 @@ class Equation {
         }
     }
 
-    private fun saveSVG2File(context: Context, fileName: String) {
+    fun saveSVG2File(context: Context, fileName: String) {
         val file = File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), fileName)
         if (!file.exists()) {
             val fos = FileOutputStream(file)

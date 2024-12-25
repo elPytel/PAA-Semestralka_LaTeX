@@ -45,9 +45,6 @@ class RenderActivity : AppCompatActivity() {
             equation?.deleteFile(this)
         }
 
-        // Get equation data from intent
-        val equationDataJson = intent.getStringExtra("equationData")
-        val equationData = Gson().fromJson(equationDataJson, EquationData::class.java)
         
         val jsonFileName = intent.getStringExtra("jsonFileName")
         val latex = intent.getStringExtra("latex")
@@ -57,13 +54,9 @@ class RenderActivity : AppCompatActivity() {
             etDescription.setText(equation.description)
             etLabel.setText(equation.label)
             etScale.setText(equation.scale.toString())
-            if (latex != null) {
-                equation.updateEquation(latex)
-            } else {
-                equation.displaySvg()
-            }
+            equation.displaySvg()
         } else if (latex != null) {
-            equation = Equation(imageView)
+            equation = Equation(this, imageView)
             equation.updateEquation(latex)
         }
 

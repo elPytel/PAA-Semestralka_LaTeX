@@ -23,7 +23,6 @@ class SavedFormulasActivity : AppCompatActivity() {
         val adapter = FormulasAdapter(formulas) { equationData ->
             val intent = Intent(this, RenderActivity::class.java)
             intent.putExtra("jsonFileName", equationData.thisFileName)
-            intent.putExtra("latex", equationData.equation)
             startActivity(intent)
         }
         recyclerView.adapter = adapter

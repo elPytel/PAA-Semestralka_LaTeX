@@ -1,5 +1,6 @@
 package com.example.semestralka
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Environment
@@ -55,7 +56,6 @@ class MainActivity : AppCompatActivity() {
             val jsonFile = File(getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), jsonFileName)
             if (!jsonFile.exists()) {
                 val equation = Equation(equationData, this, null)
-                equation.updateEquation(equationData.equation)
                 equation.saveToFile(this, equationData.svgFileName)
             }
         }
