@@ -7,11 +7,9 @@ import android.widget.ImageView
 import android.widget.Toast
 import com.caverock.androidsvg.SVG
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
-import java.lang.reflect.Type
 
 data class EquationData(
     val equation: String,

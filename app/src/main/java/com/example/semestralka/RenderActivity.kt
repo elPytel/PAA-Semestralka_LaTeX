@@ -3,21 +3,15 @@ package com.example.semestralka
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import com.caverock.androidsvg.SVG
-import com.google.gson.Gson
-import java.io.File
-import java.io.FileInputStream
+import android.graphics.Color
 
 class RenderActivity : AppCompatActivity() {
-
-    var svgContent: String? = null
-    private var currentFileName: String? = null
+    private var isModified = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,8 +31,16 @@ class RenderActivity : AppCompatActivity() {
             finish()
         }
 
+        btnSave.setBackgroundColor(if (isModified) Color.GREEN else Color.GRAY)
+
         btnSave.setOnClickListener {
-            equation?.saveOrUpdateFile(this)
+            if (isModified) {
+                equation?.saveOrUpdateFile(this)
+                isModified = false
+                btnSave.setBackgroundColor(Color.GRAY)
+            } else {
+                Toast.makeText(this, "No changes to save", Toast.LENGTH_SHORT).show()
+            }
         }
 
         btnDelete.setOnClickListener {
@@ -65,6 +67,8 @@ class RenderActivity : AppCompatActivity() {
                 val newScale = s.toString().toIntOrNull() ?: 10
                 equation?.updateScale(newScale)
                 equation?.displaySvg()
+                isModified = true
+                btnSave.setBackgroundColor(Color.GREEN)
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -74,6 +78,8 @@ class RenderActivity : AppCompatActivity() {
         etLabel.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 equation?.updateLabel(s.toString())
+                isModified = true
+                btnSave.setBackgroundColor(Color.GREEN)
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -83,6 +89,8 @@ class RenderActivity : AppCompatActivity() {
         etDescription.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
                 equation?.updateDescription(s.toString())
+                isModified = true
+                btnSave.setBackgroundColor(Color.GREEN)
             }
 
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}

@@ -6,7 +6,7 @@ Aplikace ve stylu Flashcards, kde uživatel zadá vzorec a aplikace mu ho vykres
 
 Aplikace jse sestavená a otestovaná na virtuálním stroji **Nexus S API 26**.
 
-## Pro užiatele
+## Pro uživatele
 
 Tři aktivity aplikace:
 - MainActivity.kt - hlavní aktivita aplikace
