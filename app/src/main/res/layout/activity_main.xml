@@ -17,19 +17,19 @@
             android:id="@+id/etLatex"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="Enter LaTeX formula" />
+            android:hint="@string/hint_enter_latex" />
 
         <Button
             android:id="@+id/btnRender"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Render Formula" />
+            android:text="@string/btn_render" />
 
         <Button
             android:id="@+id/btnSavedFormulas"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="View Saved Formulas" />
+            android:text="@string/btn_saved_formulas" />
 
     </LinearLayout>
 
@@ -37,7 +37,7 @@
         android:id="@+id/btnLoadDefaults"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Load Default Cards"
+        android:text="@string/btn_load_defaults"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

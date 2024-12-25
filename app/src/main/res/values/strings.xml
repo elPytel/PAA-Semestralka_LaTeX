@@ -1,3 +1,18 @@
 <resources>
-    <string name="app_name">Semestralka</string>
+    <string name="app_name">My Application</string>
+    <string name="btn_render">Render Formula</string>
+    <string name="btn_saved_formulas">View Saved Formulas</string>
+    <string name="btn_load_defaults">Load Default Cards</string>
+    <string name="hint_enter_latex">Enter LaTeX formula</string>
+    <string name="hint_enter_label">Enter label</string>
+    <string name="hint_enter_description">Enter description</string>
+    <string name="hint_enter_scale">Enter scale (default 10)</string>
+    <string name="btn_save">Save card</string>
+    <string name="btn_delete">Delete card</string>
+    <string name="btn_back">Back</string>
+    <string name="toast_default_cards_loaded">Default cards loaded</string>
+    <string name="toast_card_saved">Card saved</string>
+    <string name="toast_failed_to_save">Failed to save SVG or Json</string>
+    <string name="toast_svg_json_deleted">SVG and JSON deleted</string>
+    <string name="toast_failed_to_load_json">Failed to load JSON data</string>
 </resources>

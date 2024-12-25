@@ -1,0 +1,18 @@
+<resources>
+    <string name="app_name">Moje aplikace</string>
+    <string name="btn_render">Vykreslit formuli</string>
+    <string name="btn_saved_formulas">Zobrazit uložené formule</string>
+    <string name="btn_load_defaults">Načíst výchozí karty</string>
+    <string name="hint_enter_latex">Zadejte LaTeX formuli</string>
+    <string name="hint_enter_label">Zadejte štítek</string>
+    <string name="hint_enter_description">Zadejte popis</string>
+    <string name="hint_enter_scale">Zadejte měřítko (výchozí 10)</string>
+    <string name="btn_save">Uložit kartu</string>
+    <string name="btn_delete">Smazat kartu</string>
+    <string name="btn_back">Zpět</string>
+    <string name="toast_default_cards_loaded">Výchozí karty načteny</string>
+    <string name="toast_card_saved">Karta uložena</string>
+    <string name="toast_failed_to_save">Nepodařilo se uložit SVG nebo Json</string>
+    <string name="toast_svg_json_deleted">SVG a JSON smazány</string>
+    <string name="toast_failed_to_load_json">Nepodařilo se načíst JSON data</string>
+</resources>
