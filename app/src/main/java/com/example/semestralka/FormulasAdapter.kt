@@ -7,7 +7,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
 class FormulasAdapter(
-    private val formulas: List<EquationData>,
+    private var formulas: List<EquationData>,
     private val onItemClick: (EquationData) -> Unit
 ) : RecyclerView.Adapter<FormulasAdapter.FormulaViewHolder>() {
 
@@ -25,6 +25,11 @@ class FormulasAdapter(
 
     override fun getItemCount(): Int {
         return formulas.size
+    }
+
+    fun updateFormulas(newFormulas: List<EquationData>) {
+        formulas = newFormulas
+        notifyDataSetChanged()
     }
 
     class FormulaViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

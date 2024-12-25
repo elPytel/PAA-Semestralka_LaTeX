@@ -12,20 +12,29 @@ import java.io.File
 
 class SavedFormulasActivity : AppCompatActivity() {
 
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: FormulasAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_saved_formulas)
 
-        val recyclerView = findViewById<RecyclerView>(R.id.recyclerView)
+        recyclerView = findViewById(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         val formulas = loadSavedFormulas()
-        val adapter = FormulasAdapter(formulas) { equationData ->
+        adapter = FormulasAdapter(formulas) { equationData ->
             val intent = Intent(this, RenderActivity::class.java)
             intent.putExtra("jsonFileName", equationData.thisFileName)
             startActivity(intent)
         }
         recyclerView.adapter = adapter
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val formulas = loadSavedFormulas()
+        adapter.updateFormulas(formulas)
     }
 
     private fun loadSavedFormulas(): List<EquationData> {
