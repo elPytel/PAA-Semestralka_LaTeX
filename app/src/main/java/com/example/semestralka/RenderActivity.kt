@@ -52,18 +52,16 @@ class RenderActivity : AppCompatActivity() {
         val jsonFileName = intent.getStringExtra("jsonFileName")
         val latex = intent.getStringExtra("latex")
 
-        if (equationData != null) {
-            equation = Equation(equationData, this, imageView)
-            etDescription.setText(equation.description)
-            etLabel.setText(equation.label)
-            etScale.setText(equation.scale.toString())
-            equation.displaySvg()
-        } else if (jsonFileName != null) {
+        if (jsonFileName != null) {
             equation = Equation(jsonFileName, this, imageView)
             etDescription.setText(equation.description)
             etLabel.setText(equation.label)
             etScale.setText(equation.scale.toString())
-            equation.displaySvg()
+            if (latex != null) {
+                equation.updateEquation(latex)
+            } else {
+                equation.displaySvg()
+            }
         } else if (latex != null) {
             equation = Equation(imageView)
             equation.updateEquation(latex)

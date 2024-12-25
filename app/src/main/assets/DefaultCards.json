@@ -1,0 +1,18 @@
+[
+    {
+        "equation": "E=mc^2",
+        "label": "Einstein's Equation",
+        "description": "Energy-mass equivalence",
+        "scale": 1,
+        "svgFileName": "einstein_equation.svg",
+        "thisFileName": "einstein_equation.json"
+    },
+    {
+        "equation": "a^2 + b^2 = c^2",
+        "label": "Pythagorean Theorem",
+        "description": "Relation in Euclidean geometry",
+        "scale": 1,
+        "svgFileName": "pythagorean_theorem.svg",
+        "thisFileName": "pythagorean_theorem.json"
+    }
+]

@@ -12,12 +12,12 @@ class FormulasAdapter(
 ) : RecyclerView.Adapter<FormulasAdapter.FormulaViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FormulaViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(android.R.layout.simple_list_item_1, parent, false)
+        val view = LayoutInflater.from(parent.context).inflate(android.R.layout.simple_list_item_2, parent, false)
         return FormulaViewHolder(view)
     }
 
     override fun onBindViewHolder(holder: FormulaViewHolder, position: Int) {
-        holder.textView.text = formulas[position].label
+        holder.labelView.text = formulas[position].label
         holder.itemView.setOnClickListener {
             onItemClick(formulas[position])
         }
@@ -28,6 +28,6 @@ class FormulasAdapter(
     }
 
     class FormulaViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val textView: TextView = itemView.findViewById(android.R.id.text1)
+        val labelView: TextView = itemView.findViewById(android.R.id.text1)
     }
 }

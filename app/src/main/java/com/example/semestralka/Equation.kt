@@ -32,17 +32,17 @@ class Equation {
     private var imageView: ImageView? = null
     private var jsonFileName: String? = null
 
-    constructor(imageView: ImageView) {
+    constructor(imageView: ImageView?) {
         this.imageView = imageView
     }
 
-    constructor(equationData: EquationData, context: Context, imageView: ImageView) {
+    constructor(equationData: EquationData, context: Context, imageView: ImageView?) {
         this.imageView = imageView
         this.svgFile = loadSvgFromFile(equationData.svgFileName, context)
         data2equation(equationData)
     }
 
-    constructor(jsonFile: String, context: Context, imageView: ImageView) {
+    constructor(jsonFile: String, context: Context, imageView: ImageView?) {
         this.jsonFileName = jsonFile
         this.imageView = imageView
         val equationData = loadFromJsonFile(context, jsonFile)
@@ -57,6 +57,10 @@ class Equation {
         this.description = data.description
         this.scale = data.scale
         this.jsonFileName = data.thisFileName
+    }
+
+    fun equation2data(): EquationData {
+        return EquationData(equation!!, label!!, description!!, scale, "${jsonFileName!!.replace(".json", ".svg")}", jsonFileName!!)
     }
 
     fun setSvgContent(svgContent: String) {
@@ -90,6 +94,20 @@ class Equation {
         this.description = description
     }
 
+    fun saveData2JsonFile(context: Context, fileName: String) {
+        val jsonFile = File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), fileName)
+        if (!jsonFile.exists()) {
+            jsonFileName = fileName
+            val jsonContent = Gson().toJson(equation2data())
+            val fos = FileOutputStream(jsonFile)
+            fos.write(jsonContent.toByteArray())
+            fos.close()
+            Log.i("Equation", "JSON file: ${fileName}, saved to ${jsonFile.absolutePath}")
+        } else {
+            Log.i("Equation", "JSON file: ${fileName} already exists")
+        }
+    }
+
     private fun loadSvgFromFile(fileName: String, context: Context): SVG {
         return try {
             val file = File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), fileName)
@@ -101,23 +119,7 @@ class Equation {
             svg
         } catch (e: Exception) {
             Log.e("Equation", "Error loading SVG from file", e)
-            Toast.makeText(context, "Failed to load SVG", Toast.LENGTH_LONG).show()
             SVG.getFromString("")
-        }
-    }
-
-    private fun loadDescriptionFromFile(fileName: String, context: Context): String {
-        return try {
-            val descFileName = fileName.replace(".svg", "_description.txt")
-            val descFile = File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), descFileName)
-            val descInputStream = FileInputStream(descFile)
-            val description = descInputStream.bufferedReader().use { it.readText() }
-            descInputStream.close()
-            Log.d("Equation", "Description loaded from file")
-            description
-        } catch (e: Exception) {
-            Log.e("Equation", "Error loading description from file", e)
-            ""
         }
     }
 
@@ -134,37 +136,46 @@ class Equation {
         }
     }
 
-    private fun saveToFile(context: Context) {
-        try {
-            val timestamp = System.currentTimeMillis()
-            val fileName = "rendered_latex_${timestamp}.svg"
-            val file = File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), fileName)
+    private fun saveSVG2File(context: Context, fileName: String) {
+        val file = File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), fileName)
+        if (!file.exists()) {
             val fos = FileOutputStream(file)
             fos.write(equation!!.toByteArray())
             fos.close()
             Log.i("Equation", "SVG file: ${fileName}, saved to ${file.absolutePath}")
-
-            
-            val jsonFileName = "rendered_latex_${timestamp}.json"
-            val equationData = EquationData(
-                equation = equation!!,
-                label = label ?: "Untitled",
-                description = description ?: "",
-                scale = scale,
-                svgFileName = fileName,
-                thisFileName = jsonFileName,
-            )
-            val jsonFile = File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), jsonFileName)
-            val jsonFos = FileOutputStream(jsonFile)
-            jsonFos.write(Gson().toJson(equationData).toByteArray())
-            jsonFos.close()
-            Log.i("Equation", "JSON file: ${jsonFileName}, saved to ${jsonFile.absolutePath}")
-
-            Toast.makeText(context, "SVG and description saved to ${file.absolutePath}", Toast.LENGTH_LONG).show()
-        } catch (e: Exception) {
-            Log.e("Equation", "Error saving SVG or description", e)
-            Toast.makeText(context, "Failed to save SVG or description", Toast.LENGTH_LONG).show()
+        } else {
+            Log.i("Equation", "SVG file: ${fileName} already exists")
         }
+    }
+
+    private fun saveDescription2File(context: Context, descFileName: String) {
+        val descFile = File(context.getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS), descFileName)
+        if (!descFile.exists()) {
+            val descFos = FileOutputStream(descFile)
+            descFos.write(description!!.toByteArray())
+            descFos.close()
+            Log.i("Equation", "Description file: ${descFileName}, saved to ${descFile.absolutePath}")
+        } else {
+            Log.i("Equation", "Description file: ${descFileName} already exists")
+        }
+    }
+
+    fun saveToFile(context: Context, fileName: String) {
+        try {
+            saveSVG2File(context, fileName)
+            saveData2JsonFile(context, fileName.replace(".svg", ".json"))
+        } catch (e: Exception) {
+            Log.e("Equation", "Error saving SVG or Json", e)
+            Toast.makeText(context, "Failed to save SVG or Json", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun saveToFile(context: Context) {
+        val timestamp = System.currentTimeMillis()
+        val fileName = "rendered_latex_${timestamp}.svg"
+
+        saveToFile(context, fileName)
+        Toast.makeText(context, "Card saved", Toast.LENGTH_LONG).show()
     }
 
     fun deleteFile(context: Context) {
@@ -191,7 +202,6 @@ class Equation {
             }
         } catch (e: Exception) {
             Log.e("Equation", "Error deleting SVG or JSON", e)
-            Toast.makeText(context, "Failed to delete SVG or JSON", Toast.LENGTH_LONG).show()
         }
     }
 
