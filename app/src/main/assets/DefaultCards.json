@@ -1,0 +1,42 @@
+[
+    {
+        "equation": "E=mc^2",
+        "label": "Einstein's Equation",
+        "description": "Energy-mass equivalence",
+        "scale": 1,
+        "svgFileName": "einstein_equation.svg",
+        "thisFileName": "einstein_equation.json"
+    },
+    {
+        "equation": "a^2 + b^2 = c^2",
+        "label": "Pythagorean Theorem",
+        "description": "Relation in Euclidean geometry",
+        "scale": 1,
+        "svgFileName": "pythagorean_theorem.svg",
+        "thisFileName": "pythagorean_theorem.json"
+    },
+    {
+        "equation": "F = ma",
+        "label": "Newton's Second Law",
+        "description": "Force equals mass times acceleration",
+        "scale": 1,
+        "svgFileName": "newton_second_law.svg",
+        "thisFileName": "newton_second_law.json"
+    },
+    {
+        "equation": "F = G * (m1 * m2) / r^2",
+        "label": "Newton's Law of Universal Gravitation",
+        "description": "Force between two objects",
+        "scale": 1,
+        "svgFileName": "newton_law_gravitation.svg",
+        "thisFileName": "newton_law_gravitation.json"
+    },
+    {
+        "equation": "d/dx sin(x) = cos(x)",
+        "label": "Derivative of sin(x)",
+        "description": "Derivative of the sine function",
+        "scale": 1,
+        "svgFileName": "derivative_sin.svg",
+        "thisFileName": "derivative_sin.json"
+    }
+]
